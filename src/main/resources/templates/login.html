@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header">
+</head>
+<div class="container blog-content-container">
+	<a href="#"> <video id="video" width="600" height="550" autoplay></video>
+		<canvas style="display: none" id="bowencanvas" width="320"
+			height="320" class="right"></canvas>
+	</a>
+	<form th:action="@{~/login}" method="post" id="form">
+		<h2>请登录</h2>
+		<div class="form-group col-md-5">
+			<label for="username" class="col-form-label">账号</label> <input
+				type="text" class="form-control" id="username" name="username"
+				maxlength="50" placeholder="请输入账号">
+		</div>
+		<div class="form-group col-md-5">
+			<label for="password" class="col-form-label">密码</label> <input
+				type="password" class="form-control" id="password" name="password"
+				maxlength="30" placeholder="请输入密码">
+		</div>
+		<div class="form-group col-md-5">
+			<input type="checkbox" name="remember-me" checked="checked"
+				style="display: none">
+		</div>
+		<div class="form-group col-md-5">
+			<button type="submit" class="btn btn-primary">登录</button>
+			<!-- onclick="gogo()" -->
+		</div>
+	</form>
+	<div class="form-group col-md-5">
+		<button id="shualian" class="btn btn-primary">刷脸登录</button>
+	</div>
+
+	<!-- <a href="#"> <video id="video" width="600" height="550" autoplay></video>
+		<canvas style="display: none" id="bowencanvas" width="320"
+			height="320" class="right"></canvas>
+	</a>
+	<div class="form-group col-md-5">
+		<button id="shualian" type="submit" class="btn btn-primary">刷脸登录</button>
+	</div> -->
+
+
+
+
+</div>
+
+<!-- /container -->
+
+<script>
+	var video;
+	navigator.getUserMedia = navigator.getUserMedia
+			|| navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+	if (navigator.getUserMedia) {
+		navigator.getUserMedia({
+			audio : true,
+			video : {
+				width : 320,
+				height : 320
+			}
+		}, function(stream) {
+			let CompatibleURL = window.URL || window.webkitURL;
+			video = document.getElementById("video");
+			/*         video.src = window.URL.createObjectURL(stream);  */
+			video.srcObject = stream;
+			video.onloadedmetadata = function(e) {
+				console.log('nihao44eee4aaaaddda');
+				video.play();
+			};
+		}, function(err) {
+			console.log("The following error occurred: " + err.name);
+		});
+	} else {
+		console.log("getUserMedia not supported");
+	}
+	document
+			.getElementById("shualian")
+			.addEventListener(
+					"click",
+					function() {
+						var context = document.getElementById("bowencanvas")
+								.getContext("2d");
+						context.drawImage(video, 0, 0, 430, 325);
+						var imgData = document.getElementById("bowencanvas")
+								.toDataURL("image/jpg");
+						imgData = imgData.replace(
+								/^data:image\/(png|jpg);base64,/, "");
+						var formData = new FormData();
+						formData.append("groupId", "101");
+						formData.append("file", imgData);
+						$.ajax({
+									type : "post",
+									url : "/faceSearch",
+									data : formData,
+									contentType : false,
+									processData : false,
+									async : false,
+									success : function(text) {
+										var res = JSON.stringify(text)
+										if (text.code == 0) {
+											document.getElementById('password').value = text.data.password;
+											document.getElementById('username').value = text.data.username;
+											var form = document
+													.getElementById('form');
+											form.submit();
+										} else {
+											alert("人脸不匹配")
+										}
+
+									},
+									error : function(error) {
+										alert(JSON.stringify(error))
+									}
+
+								});
+					});
+	/* formData.append("_csrf", token);
+	formData.append("header", header);
+	formData.append("token", token); */
+	/* beforeSend : function(request) {
+	request.setRequestHeader(header, token);
+	}, 
+	console.log(token);*/
+	/* 	xiangbabang(); */
+	/*var name = text.data.name;
+	$("#nameDiv").html("姓名：" + name);
+	var similar = text.data.similarValue;
+	$("#similarDiv").html("相似度：" + similar + "%");
+	var age = text.data.age;
+	$("#ageDiv").html("年龄：" + age);
+	var gender = text.data.gender;
+	$("#genderDiv").html("性别：" + gender);
+	img.css("background-image", 'url('
+			+ text.data.image + ')'); */
+			/* var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr(
+					"content"); */
+	function gogo() {
+		var formData = new FormData();
+		formData.append("username", "123");
+		formData.append("password", "12345678");
+		/* formData.append('_csrf', token); */
+		$.ajax({
+			type : "post",
+			url : "/login",
+			data : formData,
+			contentType : false,
+			processData : false,
+			async : false,
+			/* beforeSend : function(request) {
+				request.setRequestHeader(header, token);
+			},*/
+			success : function() {
+				window.location.href = "index.html";
+			},
+			error : function(error) {
+				alert(JSON.stringify(error))
+			}
+		});
+	}
+</script>
+<!-- /* function login() {
+		var formData = new FormData();
+		formData.append("username", "123");
+		formData.append("password", "123");
+		formData.append('_csrf', token);
+		$.ajax({
+			type : "post",
+			url : "/login",
+			data : formData,
+			contentType : false,
+			processData : false,
+			async : false,
+			beforeSend : function(request) {
+				request.setRequestHeader(header, token);
+			},
+			success : function() {
+				window.location.href="index.html";
+			},
+			error : function(error) {
+				alert(JSON.stringify(error))
+			}
+		});
+		
+	} */ -->
+<!-- location.reload(); -->
+<div th:replace="fragments/footer :: footer">...</div>
+<!-- 	function login() {
+			 var form = document.getElementById('form');
+			document.getElementById("username").value = '123';
+			document.getElementById("password").value = '123';
+			form.submit();
+		} -->
+<!-- var form = document.getElementById('form');
+			document.getElementById("username").value = '123';
+			document.getElementById("password").value = '123';
+			form.submit(); -->
+<!--
+			var formData = new FormData();
+			formData.append("username", "123");
+			formData.append("password", "123");
+			$.ajax({
+				type : "post",
+				url : "/login",
+				data : formData,
+				contentType : false,
+				processData : false,
+				async : false,
+				beforeSend : function(request) {
+					request.setRequestHeader(header, token);
+				},
+				success : function() {
+
+				},
+				error : function(error) {
+					alert(JSON.stringify(error))
+				}
+			});  -->
+</body>
+</html>

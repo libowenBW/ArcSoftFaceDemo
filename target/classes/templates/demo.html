@@ -1,0 +1,382 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<!-- <!-- CSRF -->
+
+<title>人脸识别系统</title>
+
+<link rel="stylesheet" href="layui/css/layui.css">
+
+<script src="jquery/jquery-3.3.1.min.js"></script>
+<script src="layui/layui.js"></script>
+
+</head>
+<body>
+	<div class="layui-tab">
+		<ul class="layui-tab-title">
+			<li id="renlianzhuce" class="layui-this">人脸注册</li>
+			<li id="renliandenglu">人脸登录</li>
+
+		</ul>
+		<div class="layui-tab-content">
+			<div class="layui-tab-item layui-show">
+				<div class="layui-row">
+					<div class="layui-col-xs7 layui-col-md-offset3">
+						<div
+							style="width: 1024px; height: 80px; background-color: #383939">
+							<div
+								style="margin-left: 100px; height: 80px; text-align: left; line-height: 80px; font-size: 40px; color: #E51C23">
+								人脸识别系统</div>
+						</div>
+						<div
+							style="width: 1024px; height: 80px; background-color: #101010">
+							<div
+								style="display: inline; margin-left: 20px; height: 80px; text-align: left; line-height: 80px; font-size: 36px; color: #E51C23">
+								基础资料</div>
+						</div>
+
+						<div
+							style="width: 1024px; height: 600px; background-color: #383939">
+
+							<a href="#"> <video id="video" width="600" height="550"
+									autoplay></video>
+								<canvas style="display: none" id="canvas" width="320"
+									height="320" class="right"></canvas>
+							</a>
+
+
+							<div class="layui-col-xs4"
+								style="height: 824px; margin-left: 0px" id="registerDiv">
+								<div
+									style="color: #FFFFFF; font-size: 30px; margin-left: 50px; margin-top: 29px; text-align: left">
+									身份信息</div>
+
+								<form class="form-horizontal form" role="from">
+
+									<div
+										style="color: #FFFFFF; height: 50px; margin-top: 20px; margin-left: 20px; margin-right: 20px; background-color: #5A5B5B; border-radius: 5px">
+										<label
+											style="margin-left: 20px; height: 50px; line-height: 50px; font-size: 21px; text-align: right; float: left">姓名：</label>
+
+										<input
+											style="width: 180px; margin-left: auto; height: 50px; font-size: 21px; background-color: #5A5B5B; color: #FFFFFF; border: 0px;"
+											type="text" name="name">
+									</div>
+									<div
+										style="color: #FFFFFF; height: 50px; margin-top: 20px; margin-left: 20px; margin-right: 20px; background-color: #5A5B5B; border-radius: 5px">
+										<label
+											style="margin-left: 20px; height: 50px; line-height: 50px; font-size: 21px; text-align: right; float: left">账号：</label>
+
+										<input
+											style="width: 180px; margin-left: auto; height: 50px; font-size: 21px; background-color: #5A5B5B; color: #FFFFFF; border: 0px;"
+											type="text" name="id">
+									</div>
+
+
+									<input type="button" name="file" id="chooseFile"
+										style="display: none;" /> <input id="picture" type="submit"
+										class="submitInp"
+										style="color: #FFFFFF; height: 30px; display: block; margin: 0 auto; margin-top: 100px; width: 100px; background-color: #3F51B5; border-radius: 5px; text-align: center; line-height: 30px; font-size: 20px"
+										value="注册" />
+								</form>
+
+							</div>
+
+
+						</div>
+
+
+					</div>
+
+				</div>
+
+				<script>
+					window
+							.open(
+									document.location,
+									'maxwindow',
+									'width='
+											+ (window.screen.availWidth - 10)
+											+ ',height='
+											+ (window.screen.availHeight - 30)
+											+ ',top=0,left=0,resizable=yes,status=yes,location=no,menubar=no,scrollbars=yes');
+
+					/* var video;
+					$("#renliandenglu").bind("click", function() {
+					    //拍照
+						video.srcObject.stop();
+						
+					$("#renlianzhuce").bind("click", function() {
+					    //拍照
+						video.srcObject.stop();
+						video.play();
+
+					    }); */
+					/* 
+					 $("#btn_takephoto").bind("click", function() {
+					 //拍照
+					 plus.camera.getCamera().captureImage(function(p) {
+					 plus.io.resolveLocalFileSystemURL(p, function(entry) {
+					 console.log(entry.toLocalURL());
+					 $("#imgViewer").attr("src", entry.toLocalURL());
+					 }, function(e) {
+					 outLine("读取拍照文件错误：" + e.message);
+					 });
+
+					 });
+					 }); */
+
+					/* var video = document.getElementById("video");
+					 // Put video listeners into place
+					 if(navigator.getUserMedia) { // Standard 如果用户允许打开摄像头
+					 //stream为读取的视频流
+					 navigator.getUserMedia(videoObj, function(stream) {
+					 video.src = stream;
+					 video.play();
+					 }, errBack);
+					 } else if(navigator.webkitGetUserMedia) { // WebKit-prefixed  根据不同的浏览器写法不同
+					 navigator.webkitGetUserMedia(videoObj, function(stream){
+					 video.src = window.webkitURL.createObjectURL(stream);
+					 video.play();
+					 }, errBack);
+					 }
+					 else if(navigator.mozGetUserMedia) { // Firefox-prefixed
+					 navigator.mozGetUserMedia(videoObj, function(stream){
+					 video.src = window.URL.createObjectURL(stream);
+					 video.play();
+					 }, errBack);
+					 } */
+					var video;
+					navigator.getUserMedia = navigator.getUserMedia
+							|| navigator.webkitGetUserMedia
+							|| navigator.mozGetUserMedia;
+					if (navigator.getUserMedia) {
+						navigator.getUserMedia({
+							audio : true,
+							video : {
+								width : 320,
+								height : 320
+							}
+						}, function(stream) {
+							let CompatibleURL = window.URL || window.webkitURL;
+							video = document.getElementById("video");
+							/*         video.src = window.URL.createObjectURL(stream);  */
+							video.srcObject = stream;
+							video.onloadedmetadata = function(e) {
+								console.log('nihao44eee4aaaaddda');
+								video.play();
+							};
+						}, function(err) {
+							console.log("The following error occurred: "
+									+ err.name);
+						});
+					} else {
+						console.log("getUserMedia not supported");
+					}
+
+					document
+							.getElementById("picture")
+							.addEventListener(
+									"click",
+									function() {
+										var token = $("meta[name='_csrf']")
+												.attr("content");
+										var header = $(
+												"meta[name='_csrf_header']")
+												.attr("content");
+										var context = document.getElementById(
+												"canvas").getContext("2d");
+										context
+												.drawImage(video, 0, 0, 430,
+														325);
+										var imgData = document.getElementById(
+												"canvas")
+												.toDataURL("image/jpg");
+										imgData = imgData
+												.replace(
+														/^data:image\/(png|jpg);base64,/,
+														"");
+										var formData = new FormData();
+										var a = $('#registerDiv .form')
+												.serializeArray();
+
+										for ( var item in a) {
+											formData.append(a[item].name,
+													a[item].value)
+										}
+										formData.append("file", imgData);
+										formData.append("header", header);
+										formData.append("token", token);
+										formData.append("groupId", "101");
+										if (formData.get("name") == "") {
+											alert("请输入名字")
+											return;
+										}
+
+										if (formData.get("groupId") == "") {
+											alert("请输入库Id")
+											return;
+										}
+										$
+												.ajax({
+													type : "post",
+													url : "/faceAdd",
+													data : formData,
+													contentType : false,
+													processData : false,
+													async : false,
+													beforeSend : function(
+															request) {
+														request
+																.setRequestHeader(
+																		header,
+																		token);
+													},
+													success : function(text) {
+														var res = JSON
+																.stringify(text)
+														if (text.code == 0) {
+															alert("注册成功，博客系统账号："
+																	+ formData
+																			.get("name")
+																	+ "初始密码为:000000")
+														} else {
+															alert(text.message)
+														}
+
+													},
+													error : function(error) {
+
+														alert(JSON
+																.stringify(error))
+													}
+
+												});
+									});
+				</script>
+
+			</div>
+			<div class="layui-tab-item">
+				<div class="layui-row">
+					<div class="layui-col-xs7 layui-col-md-offset3">
+						<div
+							style="width: 1000px; height: 800px; border: 1px; background-color: #383939">
+
+							<div
+								style="float: left; height: 80px; width: 100%; line-height: 80px; text-align: center; color: #ffffff; font-size: 40px">
+								点击图像区域并正对屏幕(摄像头)进行人脸扫描</div>
+							<a href="#">
+								<div id="imageDivComp"
+									style="background-image: url(images/v2_pgfcmk.png); background-repeat: no-repeat; background-position: center center; background-size: cover; /* 覆盖:图片成比例填满盒子。可用于适配 */ background-size: contain; float: left; height: 500px; width: 100%; border: 1px solid #877dd6">
+								</div>
+								<canvas style="display: none" id="bowencanvas" width="320"
+									height="320" class="right"></canvas> <input name="file"
+								id="chooseFileComp" style="display: none;" />
+								<div
+									style="float: left; height: 40px; width: 100%; line-height: 40px; text-align: center; color: #ffffff; font-size: 30px">
+									<div id="nameDiv"></div>
+									<div id="similarDiv"></div>
+									<div id="ageDiv"></div>
+									<div id="genderDiv"></div>
+
+									<input id="postData" type="button" class="submitInp"
+										style="color: #FFFFFF; height: 30px; display: block; margin: 0 auto; margin-top: 100px; width: 100px; background-color: #3F51B5; border-radius: 5px; text-align: center; line-height: 30px; font-size: 20px"
+										value="点击登录" />
+								</div>
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+			<script>
+				/* navigator.getUserMedia = navigator.getUserMedia ||
+				 navigator.webkitGetUserMedia ||
+				 navigator.mozGetUserMedia; */
+				/* function gotoo(){
+				 var formData = new FormData();
+				 formData.append("name", name);
+				 formData.append("password", password);
+
+				 } */
+				var username;
+				var password;
+				var token = $("meta[name='_csrf']").attr("content");
+				var header = $("meta[name='_csrf_header']").attr("content");
+				$("#imageDivComp").click(
+						function() {
+							var formData = new FormData();
+							formData.append("groupId", "101");
+							var context = document
+									.getElementById("bowencanvas").getContext(
+											"2d");
+							context.drawImage(video, 0, 0, 430, 325);
+							var imgData = document
+									.getElementById("bowencanvas").toDataURL(
+											"image/jpg");
+							imgData = imgData.replace(
+									/^data:image\/(png|jpg);base64,/, "");
+							formData.append("file", imgData);
+							$.ajax({
+								type : "post",
+								url : "/faceSearch",
+								data : formData,
+								contentType : false,
+								processData : false,
+								async : false,
+								beforeSend : function(request) {
+									request.setRequestHeader(header, token);
+								},
+								success : function(text) {
+									var res = JSON.stringify(text)
+									if (text.code == 0) {
+										password = text.data.password;
+										username = text.data.userName;
+										var name = text.data.name;
+										$("#nameDiv").html("姓名：" + name);
+										var similar = text.data.similarValue;
+										$("#similarDiv").html(
+												"相似度：" + similar + "%");
+										var age = text.data.age;
+										$("#ageDiv").html("年龄：" + age);
+										var gender = text.data.gender;
+										$("#genderDiv").html("性别：" + gender);
+										img.css("background-image", 'url('
+												+ text.data.image + ')');
+
+									} else {
+										$("#nameDiv").html("");
+										$("#similarDiv").html("");
+										$("#ageDiv").html("");
+										$("#genderDiv").html("");
+										alert("人脸不匹配")
+									}
+
+								},
+								error : function(error) {
+									$("#nameDiv").html("");
+									$("#similarDiv").html("");
+									$("#ageDiv").html("");
+									$("#genderDiv").html("");
+									alert(JSON.stringify(error))
+								}
+
+							});
+
+						});
+			</script>
+		</div>
+
+	</div>
+
+
+	<script>
+		//注意：选项卡 依赖 element 模块，否则无法进行功能性操作
+		layui.use('element', function() {
+			var element = layui.element;
+
+		});
+	</script>
+</html>

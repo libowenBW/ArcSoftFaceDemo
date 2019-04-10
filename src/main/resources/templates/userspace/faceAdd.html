@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head th:replace="fragments/header :: header">
+</head>
+<body>
+	<!-- Page Content -->
+	<div class="container blog-content-container">
+		<!-- 右侧栏目 -->
+		<div class="col-md-8 col-xl-9">
+			<!-- 个人设置 -->
+			<div class="card ">
+				<h5 class="card-header">
+					<i class="fa fa-cog" aria-hidden="true"></i> 个人设置
+				</h5>
+				<div class="card-block">
+					<div>
+						<video id="video" width="600" height="550" autoplay></video>
+						<!--style="float: right"  -->
+						<canvas style="display: none" id="canvas" width="320" height="320"
+							class="right"></canvas>
+					</div>
+					<input id="username" th:value="${userModel.user.username}"
+						style="display: none"></input>
+					<div class="form-group">
+						<button type="submit" id="picture" class="btn btn-primary">提交</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /.row -->
+	</div>
+	<!-- /.container -->
+	<!-- The modal -->
+
+	<div th:replace="fragments/footer :: footer">...</div>
+	<script>
+		var video;
+		navigator.getUserMedia = navigator.getUserMedia
+				|| navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+		if (navigator.getUserMedia) {
+			navigator.getUserMedia({
+				audio : true,
+				video : {
+					width : 320,
+					height : 320
+				}
+			}, function(stream) {
+				let CompatibleURL = window.URL || window.webkitURL;
+				video = document.getElementById("video");
+				/*         video.src = window.URL.createObjectURL(stream);  */
+				video.srcObject = stream;
+				video.onloadedmetadata = function(e) {
+					console.log('nihao44eee4aaaaddda');
+					video.play();
+				};
+			}, function(err) {
+				console.log("The following error occurred: " + err.name);
+			});
+		} else {
+			console.log("getUserMedia not supported");
+		}
+
+		document
+				.getElementById("picture")
+				.addEventListener(
+						"click",
+						function() {
+							/* var token = $("meta[name='_csrf']").attr("content");
+							var header = $("meta[name='_csrf_header']").attr(
+									"content"); */
+							var context = document.getElementById("canvas")
+									.getContext("2d");
+							var username=document.getElementById("username").value;
+							context.drawImage(video, 0, 0, 430, 325);
+							var imgData = document.getElementById("canvas")
+									.toDataURL("image/jpg");
+							imgData = imgData.replace(
+									/^data:image\/(png|jpg);base64,/, "");
+							var formData = new FormData();
+							formData.append("file", imgData);
+							/* formData.append("_csrf", token);
+							formData.append("header", header);
+							formData.append("token", token); */
+							formData.append("groupId", "101");
+
+							if (formData.get("groupId") == "") {
+								alert("请输入库Id")
+								return;
+							}
+							$.ajax({
+								type : "post",
+								url : "/u/"+username+"/saveFace",
+								data : formData,
+								contentType : false,
+								processData : false,
+								async : false,
+								success : function(text) {
+									var res = JSON.stringify(text)
+									if (text.code == 0) {
+										alert("人脸信息获取成功");
+										window.location.href = "profile.html";
+									} else {
+										alert(text.message)
+									}
+
+								},
+								error : function(error) {
+
+									alert(JSON.stringify(error))
+								}
+
+							});
+						});
+	</script>
+	<!-- JavaScript -->
+	<script th:inline="javascript">
+    	var fileServerUrl = [[${userModel.fileServerUrl}]];
+	</script>
+	<script src="../../js/userspace/main.js"
+		th:src="@{/js/userspace/main.js}"></script>
+
+</body>
+</html>

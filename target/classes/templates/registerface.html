@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+<!-- Tether core CSS -->
+<link href="/css/tether.min.css" rel="stylesheet" />
+
+<!-- Bootstrap CSS -->
+<link href="/css/bootstrap.min.css" rel="stylesheet" />
+
+<!-- Font-Awesome CSS -->
+<link href="/css/font-awesome.min.css" rel="stylesheet" />
+
+<!-- NProgress CSS -->
+<link href="/css/nprogress.css" rel="stylesheet" />
+
+<!-- thinker-md CSS -->
+<link href="/css/thinker-md.vendor.css" rel="stylesheet" />
+
+<!-- bootstrap tags CSS -->
+<link href="/css/jquery.tagsinput.min.css" rel="stylesheet" />
+
+<!-- bootstrap chosen CSS -->
+<link href="/css/component-chosen.min.css" rel="stylesheet" />
+
+<!-- toastr CSS -->
+<link href="/css/toastr.min.css" rel="stylesheet" />
+
+<!-- jQuery image cropping plugin CSS -->
+<link href="/css/cropbox.css" rel="stylesheet" />
+
+<!-- Custom styles -->
+<link href="/css/style.css" rel="stylesheet" />
+<link href="/css/thymeleaf-bootstrap-paginator.css" rel="stylesheet" />
+<link href="/css/blog.css" rel="stylesheet" />
+<link rel="stylesheet" href="layui/css/layui.css">
+
+<script src="jquery/jquery-3.3.1.min.js"></script>
+<script src="layui/layui.js"></script>
+</head>
+<body>
+	<nav class="navbar navbar-inverse bg-inverse navbar-toggleable-md">
+		<div class="container">
+			<button aria-controls="navbarsExampleContainer" aria-expanded="false"
+				aria-label="Toggle navigation"
+				class="navbar-toggler navbar-toggler-right"
+				data-target="#navbarsContainer" data-toggle="collapse" type="button">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<a class="navbar-brand" href="/">NewStarBlog</a>
+
+			<div class="collapse navbar-collapse" id="navbarsContainer">
+
+				<ul class="navbar-nav mr-auto">
+					<li class="nav-item"><a class="nav-link"
+						href="javascript:void(0)" url="/blogs?order=new">最新 <span
+							class="sr-only">(current)</span>
+					</a></li>
+					<li class="nav-item"><a class="nav-link"
+						href="javascript:void(0)" url="/blogs?order=hot">最热</a></li>
+					<form class="form-inline mt-2 mt-md-0">
+						<input class="form-control mr-sm-2" id="indexkeyword"
+							placeholder="搜索" type="text" value="" /> <a
+							class="btn btn-outline-secondary my-2 my-sm-0"
+							href="javascript:void(0)" id="indexsearch"> <i
+							aria-hidden="true" class="fa fa-search"></i>
+						</a>
+					</form>
+
+				</ul>
+
+
+
+				<div>
+					<a class="btn btn-outline-success my-2 my-sm-0"
+						href="/registerface" type="submit">Face Recognition</a> <a
+						class="btn btn-outline-success my-2 my-sm-0" href="/login"
+						type="submit">登录</a> <a
+						class="btn btn-outline-success my-2 my-sm-0" href="/register"
+						type="submit">注册</a>
+				</div>
+			</div>
+
+		</div>
+	</nav>
+
+</body>
+</head>
+<body>
+
+	<div class="container blog-content-container" id="formdiv">
+		<div>
+			<video id="video" width="600" height="550" autoplay
+				style="float: right"></video>
+			<canvas style="display: none" id="canvas" width="320" height="320"
+				class="right"></canvas>
+		</div>
+		<form>
+			<h2 class="form-signin-heading">注册成为博主</h2>
+
+			<div class="form-group col-md-5">
+				<label for="username" class="col-form-label">账户id</label> <input
+					type="text" class="form-control" id="id" name="id" maxlength="50"
+					minlength="9" placeholder="请输入网名，至少9个字符，至多20个">
+			</div>
+			<div class="form-group col-md-5">
+				<label for="username" class="col-form-label">网名</label> <input
+					type="text" class="form-control" id="username" name="username"
+					maxlength="50" minlength="1" placeholder="请输入账号，至少3个字符，至多20个">
+
+			</div>
+		</form>
+		<div class="form-group col-md-5" id="picture">
+			<button class="btn btn-primary">提交</button>
+		</div>
+	</div>
+	<!-- /container -->
+
+
+	<!-- <div th:replace="fragments/footer :: footer">...</div> -->
+	<script>
+		var username;
+		var password;
+		var video;
+		navigator.getUserMedia = navigator.getUserMedia
+				|| navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+		if (navigator.getUserMedia) {
+			navigator.getUserMedia({
+				audio : true,
+				video : {
+					width : 320,
+					height : 320
+				}
+			}, function(stream) {
+				let CompatibleURL = window.URL || window.webkitURL;
+				video = document.getElementById("video");
+				/*         video.src = window.URL.createObjectURL(stream);  */
+				video.srcObject = stream;
+				video.onloadedmetadata = function(e) {
+					console.log('nihao44eee4aaaaddda');
+					video.play();
+				};
+			}, function(err) {
+				console.log("The following error occurred: " + err.name);
+			});
+		} else {
+			console.log("getUserMedia not supported");
+		}
+
+		document.getElementById("picture").addEventListener(
+				"click",
+				function() {
+					/* var token = $("meta[name='_csrf']").attr("content");
+					var header = $("meta[name='_csrf_header']").attr(
+							"content"); */
+					var context = document.getElementById("canvas").getContext(
+							"2d");
+					context.drawImage(video, 0, 0, 430, 325);
+					var imgData = document.getElementById("canvas").toDataURL(
+							"image/jpg");
+					imgData = imgData.replace(/^data:image\/(png|jpg);base64,/,
+							"");
+					var formData = new FormData();
+					formData.append("file", imgData);
+					/* formData.append("header", header);
+					formData.append("token", token); */
+					formData.append("id", document.getElementById("id").value);
+					formData.append("username", document
+							.getElementById("username").value);
+					formData.append("groupId", "101");
+					if (formData.get("username") == "") {
+						alert("请输入名字")
+						return;
+					}
+
+					if (formData.get("groupId") == "") {
+						alert("请输入库Id")
+						return;
+					}
+					$.ajax({
+						type : "post",
+						url : "/faceAdd",
+						data : formData,
+						contentType : false,
+						processData : false,
+						async : false,
+						success : function(text) {
+							var res = JSON.stringify(text)
+							if (text.code == 0) {
+								alert("注册成功，博客系统账号：" + formData.get("username")
+										+ "初始密码为:000000，进入系统请补全其余信息");
+								window.location.href = "login.html";
+							} else {
+								alert(text.message)
+							}
+
+						},
+						error : function(error) {
+
+							alert(JSON.stringify(error))
+						}
+
+					});
+				});
+	</script>
+</body>
+</html>
